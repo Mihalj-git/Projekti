@@ -1,0 +1,68 @@
+#include <Servo.h>
+//SERVO SETUP
+Servo myservo;  
+
+//PIN SETUP
+int motorPIN1 = 11; //desni motor
+int motorPIN2 = ; //lijevi motor
+int servopin = 9;
+int servoVC = 4;
+int potpin = 0;  
+int y_koord = 1; //zbog bolje prilagodbe je x os zapravo y os na joysticku
+int x_koord = 2;                                                           
+int laserPin1 = 8;
+int laserPin2 = 7;
+int SW_pin = 5;
+
+//BOOLEANI
+bool gumb = false;
+
+void setup() {
+  myservo.attach(servopin);
+  myservo.write(30);
+  //PIN MODES SETUP
+  pinMode(laserPin1,OUTPUT);
+  pinMode(laserPin2,OUTPUT);
+  pinMode(SW_pin,INPUT_PULLUP);
+  pinMode(servoVC,OUTPUT);
+  digitalWrite(servoVC,HIGH);
+}
+
+
+void kretanje(){
+  int smjer = map(analogRead(x_koord),0,1023,0,255);
+  smjer = constrain(smjer,0,255);
+  int gore = map(analogRead(y_koord),0,1023,0,255);
+  gore = constrain(gore,0,127);
+  int brzdesni = smjer-gore;
+  brzdesni = constrain(brzdesni,0,255);
+  int brzlijevi = 255-smjer-gore;
+  brzlijevi = constrain(brzlijevi,0,255);
+  analogWrite(motorPIN1,brzdesni);
+  analogWrite(motorPIN2,brzlijevi);
+}
+
+
+void top(){
+  if(digitalRead(SW_pin) == 0){
+    digitalWrite(laserPin1,HIGH);
+    digitalWrite(laserPin2,HIGH);A
+  }else{
+    digitalWrite(laserPin1,LOW);
+    digitalWrite(laserPin2,LOW);
+  }
+}
+
+
+
+void loop() {
+  
+  int val = analogRead(potpin);
+  int kut = map(val,0,1023,3,177);
+  kut = constrain(kut,3,177);
+  myservo.write(kut);
+  top();
+  kretanje();
+  delayMicroseconds(3);
+}
+
