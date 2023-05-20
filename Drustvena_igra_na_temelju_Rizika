@@ -1,0 +1,342 @@
+//ZA LCD
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x3F, 2,1,0,4,5,6,7,3,POSITIVE); 
+
+//Statični podatci-cijene akcija
+  //statični podaci tijekom cijele igre
+  int igraci;
+  //ratna podrška
+  int WS_tenzija = 1;
+  int WS_PM = 50;
+  int WS_Increase = 5;
+  //Vezano za rat
+  int PM_za_wargoal = 300;
+  int nastanak_tenzije_Minors = 6;
+  int nastanak_tenzije_Majors = 12;
+  int ST_zbog_rata = 10;
+  int WS_zbog_rata = 10;
+  //stabilnost
+  int PM_za_ST = 50;
+  int WS_decrease_bcST = 2;
+  int ST_increase = 5;
+  
+//GUMBOVI
+int gumb1 = 3;
+int gumb2 = 4;
+int gumb3 = 5;
+int gumb4= 6;
+int startGUMB = 7;
+
+//Općenite vrijednosti koje se mjenjaju tijekom igre
+float godina = 2030;
+float svjetska_tenzija = 0;
+int pol_moc[3] = {40,80,30};
+int stabilnost[3] = {65,50,80};
+int ratna_podrska[3] = {20,35,10};
+
+//Podatci povezani uz pojedine funkcije-KRIZA
+float tr_krize;
+boolean krizica = false;
+int krizomjerac = 0;
+float akceleracija = 0;
+
+//Podatci povezani uz pojedine funkcije-Koalicija
+int tenzija_drzava[3] = {0,0,0};
+boolean ima_koaliciju[3] = {false,false,false};
+
+//Podatci povezani uz pojedine funkcije-SSSR
+int podrska_komunista = 5;
+int PM_for_increase = 125;
+boolean SSSR_ujedinjen = false;
+
+//Podatci povezani uz pojedine funkcije-AFRIČKO-EUROPSKA UNIJA
+boolean AEU = false;
+int inkrement = 0;
+
+
+#include "Funk.h"
+
+
+void setup() {
+  //Setup za ARDUINO
+  Serial.begin(9600);
+  pinMode(gumb1,INPUT_PULLUP);
+  pinMode(gumb2,INPUT_PULLUP);
+  pinMode(gumb3,INPUT_PULLUP);
+  pinMode(gumb4,INPUT_PULLUP);
+  pinMode(startGUMB,INPUT_PULLUP);
+  //SETUP ZA LCD
+  lcd.begin(16,2);
+  lcd.clear();
+  lcd.noBlink();
+  lcd.noCursor();
+  lcd.home();
+  
+  //Početak igre-Setup za početak igre
+  lcd.print("Koliko igraca?");
+  lcd.setCursor(0,2);
+  lcd.print("-L:2  D:3 igraca");
+
+  while(digitalRead(gumb1)== 1 and digitalRead(gumb2)== 1);
+  if(digitalRead(gumb1) == 0){
+    igraci = 2;
+    lcd.clear();
+    lcd.home();
+    lcd.print("2 igraca!");
+    lcd.setCursor(0,2);
+    lcd.print("1:US,2:RUS");
+  }else if(digitalRead(gumb2) == 0){
+    igraci = 3;
+    lcd.clear();
+    lcd.home();
+    lcd.print("3 igraca!");
+    lcd.setCursor(0,2);
+    lcd.print("1:US,2:RUS,3:EU");
+  }
+  delay(1000);
+
+}
+
+void loop() {
+  //EVENT ZA RUSIJU
+  if(SSSR_ujedinjen == false){  
+    novi_komunisti(podrska_komunista);
+  }
+  if(podrska_komunista >= 50){
+    lcd.clear();
+    lcd.home();
+    lcd.print("SSSR je ponovno");
+    lcd.setCursor(0,2);
+    lcd.print("ujedinjen!");
+    SSSR_ujedinjen = true;
+    delay(1000);
+  }
+  
+  //KRIZA
+  if(krizica){
+    tr_krize -= 0.5;
+  }else{
+    krizometar(krizomjerac,tr_krize,akceleracija,krizica);
+  }
+  if(tr_krize == 0 and krizica == true){
+    krizica = false;
+    lcd.clear();
+    lcd.home();
+    lcd.print("Nema vise krize!");  
+    delay(1000);
+  }
+  
+  for(int i = 0;i<igraci;i++){
+    
+    //EVENTI ZA POJEDINU DRŽAVU
+    kolaps_drustva(stabilnost[i]);
+    if(ima_koaliciju[i]==false){
+      koalicija(svjetska_tenzija,tenzija_drzava[i],i);
+    }
+    
+    //Gumbovi za odredjene akcije
+    while(digitalRead(startGUMB) == 1){
+      
+      //UI Display s politickom moci, stabilnosti, ratnom podrškom i imenom drzave
+      UI(i,pol_moc[i],tenzija_drzava[i],stabilnost[i],ratna_podrska[i],AEU);
+      stabilnost[i] = constrain(stabilnost[i],0,100);
+      ratna_podrska[i] = constrain(ratna_podrska[i],0,100);
+      
+      //STABILNOST-GUMB 1
+      if(digitalRead(gumb1)== 0 and stabilnost[i] <= 100){
+        if(pol_moc[i]>=PM_za_ST){
+          stabilnost[i] += ST_increase;
+          ratna_podrska[i] -= WS_decrease_bcST;
+          pol_moc[i] -= PM_za_ST;
+          delay(500);
+          UI(i,pol_moc[i],tenzija_drzava[i],stabilnost[i],ratna_podrska[i],AEU);
+        }else{
+          //nemas dovoljno Pol Moci
+          lcd.clear();
+          lcd.home();
+          lcd.print("Nemas dovoljno");
+          lcd.setCursor(0,2);
+          lcd.print("politicke moci!");
+          delay(1000);
+        }
+      }
+      
+      //RATNA PODRŠKA-GUMB 2
+      if(digitalRead(gumb2)== 0 and ratna_podrska[i] <= 100){
+        if(pol_moc[i]>=WS_PM){
+          ratna_podrska[i] += WS_Increase;
+          pol_moc[i] -= WS_PM;
+          svjetska_tenzija += WS_tenzija;
+          tenzija_drzava[i] += WS_tenzija;
+          delay(500);
+          UI(i,pol_moc[i],tenzija_drzava[i],stabilnost[i],ratna_podrska[i],AEU);
+        }else{
+          //nemas dovoljno Pol Moci
+          lcd.clear();
+          lcd.home();
+          lcd.print("Nemas dovoljno");
+          lcd.setCursor(0,2);
+          lcd.print("politicke moci!");
+          delay(1000);
+        }
+      }
+      
+      //RAT-GUMB 3
+      if(digitalRead(gumb3)== 0){
+        if(pol_moc[i]>=PM_za_wargoal and ratna_podrska[i]>=50){
+          if(Justify_wargoal(gumb1,gumb2,svjetska_tenzija,tenzija_drzava[i],ratna_podrska[i],stabilnost[i])){
+            //Možeš napasti ovaj potez
+            lcd.clear();
+            lcd.home();
+            lcd.print("Mozes napasti ovaj");
+            lcd.setCursor(0,2);
+            lcd.print("potez!");
+            delay(1000);
+          }else{
+            //Napadni sljedeci potez
+            lcd.clear();
+            lcd.home();
+            lcd.print("Napadni sljedeci");
+            lcd.setCursor(0,2);
+            lcd.print("potez!");
+            delay(1000);
+          }
+          pol_moc[i] -= PM_za_wargoal;
+        }else{
+          if(pol_moc[i]<PM_za_wargoal){
+            //nemas dovoljno Pol Moci
+            lcd.clear();
+            lcd.home();
+            lcd.print("Nemas dovoljno");
+            lcd.setCursor(0,2);
+            lcd.print("politicke moci!");
+            delay(1000);
+          }else{
+            //nemas dovoljno ratne podrske
+            lcd.clear();
+            lcd.home();
+            lcd.print("Nemas dovoljno");
+            lcd.setCursor(0,2);
+            lcd.print("ratne podrske!");
+            delay(1000);
+          }
+        }
+      }
+      
+      //ODLUKE ZA POJEDINE DRŽAVE-GUMB 4
+      if(digitalRead(gumb4)== 0){
+        switch(i){
+          //INTERVENCIJA U J.AMERICI
+          case 0:
+            if(pol_moc[0] >= 150 and ratna_podrska[0] >= 35){
+              if(Justify_wargoal(gumb1,gumb2,svjetska_tenzija,tenzija_drzava[0],ratna_podrska[0],stabilnost[0])){
+                //Možeš napasti ovaj potez
+                lcd.clear();
+                lcd.home();
+                lcd.print("Mozes napasti ovaj");
+                lcd.setCursor(0,2);
+                lcd.print("potez!");
+                delay(1000);
+              }else{
+                //Napadni sljedeci potez
+                lcd.clear();
+                lcd.home();
+                lcd.print("Napadni sljedeci");
+                lcd.setCursor(0,2);
+                lcd.print("potez!");
+                delay(1000);
+              }
+              pol_moc[0] -= 150;
+              tenzija_drzava[0] -= 4;
+              svjetska_tenzija -= 4;
+            }else{
+              if(pol_moc[0]<150){
+                //nemas dovoljno Pol Moci
+                lcd.clear();
+                lcd.home();
+                lcd.print("Nemas dovoljno");
+                lcd.setCursor(0,2);
+                lcd.print("politicke moci!");
+                delay(1000);
+              }else{
+                //Nemas dovoljno ratne podrske
+                lcd.clear();
+                lcd.home();
+                lcd.print("Nemas dovoljno");
+                lcd.setCursor(0,2);
+                lcd.print("ratne podrske!");
+                delay(1000);
+              }  
+            } 
+            break;
+          
+          //SSSR se ujedinio  
+          case 1:
+            if(pol_moc[1]>=PM_for_increase){
+              podrska_komunista += 3;
+              lcd.clear();
+              lcd.home();
+              lcd.print("Komunizam:");
+              lcd.print(podrska_komunista);
+              delay(1000);
+            }else{
+              //Nemas dovoljno POL MOCI
+              lcd.clear();
+              lcd.home();
+              lcd.print("Nemas dovoljno");
+              lcd.setCursor(0,2);
+              lcd.print("politicke moci!");
+              delay(1000);
+            }
+            break;
+          
+          //AFRIČKO_EUROPSKA UNIJA  
+          case 2:
+            if(pol_moc[2]>=50 and AEU == false){
+              if(postotak(5+inkrement)){
+                //AFRIČKO_EUROPSKA UNIJA NASATAJE
+                lcd.clear();
+                lcd.home();
+                lcd.print("Africko-Europska");
+                lcd.setCursor(0,2);
+                lcd.print("Unija nastaje!");
+                AEU = true;
+                delay(1000);
+              }else{
+                //Nije uspjelo
+                lcd.clear();
+                lcd.home();
+                lcd.print("Akcija nije");
+                lcd.setCursor(0,2);
+                lcd.print("bila uspjesna");
+                delay(1000);
+              } 
+              pol_moc[2] -= 50;
+              inkrement += 2;
+            } 
+            break;
+        }
+      }
+      delayMicroseconds(15);
+    }
+    
+    //PODIZANJE POL MOĆI
+    switch(i){
+      case 0:
+        pol_moc[0] += 40;
+        break;
+      case 1:
+        pol_moc[1] += 80;
+        break;
+      case 2:
+        pol_moc[2] += 30;
+        break;
+    }
+    delay(1500);
+  }
+  
+  //Završetak runde
+  svjetska_tenzija -= 0.25;
+  godina += 0.5;
+}
