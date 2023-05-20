@@ -32,4 +32,4 @@ određene promjene na kraju poteza a prikazuje ih igračima početkom sljedećeg
 Milijunaš:
 
 Interaktivna igra Milijunaš temeljena na istoimenoj televizijskoj igri. Korištenjem Python-a i njegovih library-ja dizajnirano je grafičko 
-sučelje te sam algoritam za igru. Grafičko sučelje je napravljeno na dva načina, korištenjem Turtle te Tkinter library-ja.
+sučelje te sam algoritam za igru. Grafičko sučelje je napravljeno na dva načina, korištenjem Turtle te Tkinter bibilioteka.
