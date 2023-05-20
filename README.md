@@ -13,7 +13,10 @@ na prednjem dijelu tenka.
 
 Auto:
 
-
+Program namijenjen za model automobila napravljen pomoću Arduina, Ultrazvučnog senzora(HC-SRO4), H mosta(za DC motore),
+servo motora i plastičnog modela podloge automobila napravljenog 3D printerom. Auto ima osnovne funkcije izbjegavanja 
+frontalnog sudara te algoritam za okretanje unatrag prilikom pronalaska predmeta ispred sebe. Servo motor služi za okretanje
+prednjih kotača kako bi se automobil mogao pravilno usmjeriti. Mala prijenosna baterija služi kao izvor napona automobila.
 
 Društvena igra na temelju Rizika:
 
