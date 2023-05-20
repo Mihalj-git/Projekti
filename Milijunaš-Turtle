@@ -1,0 +1,429 @@
+#### "Milijunaš"
+
+from random import *
+from turtle import *
+from time import *
+
+
+speed(10000)
+
+def pravokutnik(a,b):
+    for i in range(2):
+        fd(a)
+        lt(90)
+        fd(b)
+        lt(90)
+    return
+
+def odgovor(odg1, toc_odg,t_odg):
+    if int(odg1) == int(toc_odg):
+        pu()
+        goto(-70,-270)
+        pd()
+        rt(60)
+        color('green')
+        begin_fill()
+        pravokutnik(70,20)
+        end_fill()
+        fd(70)
+        lt(90)
+        fd(20)
+        begin_fill()
+        pravokutnik(100,20)
+        end_fill()
+        t_odg = False
+        
+    elif int(odg1) != int(toc_odg):
+        pu()
+        goto(-40,-270)
+        pd()
+        rt(60)
+        color('red')
+        begin_fill()
+        pravokutnik(100,20)
+        end_fill()
+        pu()
+        goto(-40,-350)
+        pd()
+        lt(30)
+        begin_fill()
+        pravokutnik(20,100)
+        end_fill()
+        print('Završila igra!')
+        t_odg = False
+    odg = 0
+    pu()
+    home()
+    return int(odg1) == int(toc_odg)
+
+def koord(x,y):
+    
+    if (x-50)**2+(y-91)**2<225:
+        pub = True
+        print('PUB')
+        print(pub)
+    elif (x-50)**2+(y-25)**2<225:
+        remov = True
+        print('REMOV')
+        print(remov)
+    elif x>-210 and y>-100 and x<-20 and y<-50:
+        odg = '1'
+        print('1')
+    elif x>20 and y>-100 and x<210 and y<-50:
+        odg = '2'
+        print('2')
+    elif x>-210 and y>-170 and x<-20 and y<-120:
+        odg = '3'
+        print('3')
+    elif x>20 and y>-170 and x<210 and y<-120:
+        odg = '4'
+        print('4')
+    print('BLALALAL')
+    return
+
+def pokretac(pub1,remov1,odg1,pit,ui):
+    if pub1:
+        pit.publika(ui)
+    elif remov1:
+        pit.remove2(ui)
+    elif odg1 != 0:
+        odgovor(odg,pit)
+
+class Pitanja:
+
+    
+    def __init__(self, pit, odg1,odg2,odg3,odg4, tocan_odg, br_bodova):
+        self.pit = str(pit)
+        self.odg1 = str(odg1)
+        self.odg2 = str(odg2)
+        self.odg3 = str(odg3)
+        self.odg4 = str(odg4)
+        self.toc_odg = tocan_odg
+        self.bod = br_bodova
+        return
+
+
+    def __repr__(self):
+        return str(self.pit)
+
+
+def remove2(toc_odg):
+    lista = [1,2,3,4]
+    lista.remove(int(toc_odg))
+    x = randint(0,2)
+    lista2 = []
+    lista2.append(lista.pop(x))
+    x = randint(0,1)
+    lista2.append(lista.pop(x))
+    ui.prekrizi(lista2[0])
+    ui.prekrizi(lista2[1])
+        
+def publika(toc_odg):
+    lista = [1,2,3,4]
+    x = randint(1,60)
+    y = 20 + randint(1,80-x)
+    z = randint(0,100-x-y)
+    g = 100-x-y-z
+    k = 0
+    lista[int(toc_odg)-1] = y
+    l = [x,z,g]
+    for i in range(len(lista)):
+        if i != (int(toc_odg)-1):
+            lista[i] = l[k]
+            k += 1
+    ui.publikagraf(lista)
+        
+class UI:
+    
+    def __init__(self,sirina,duzina,boja,okvir,okvir_boja):
+        self.a = sirina
+        self.b = duzina
+        self.c = boja
+        self.d = okvir
+        self.e = okvir_boja
+        return
+
+    
+    def screen(self):
+        ht()
+        speed(10000)
+        pu()
+        goto(-self.a/2,-self.b/2)
+        pd()
+        
+        color(self.e)
+        begin_fill()
+        pravokutnik(self.a,self.b)
+        end_fill()
+
+        pu()
+        goto(-(self.a-self.d)/2,-(self.b-self.d)/2)
+        pd()
+        
+        color(self.c)
+        begin_fill()
+        pravokutnik(self.a-self.d,self.b-self.d)
+        end_fill()
+        color('black')
+        pu()
+        goto(0,(self.b-self.d-150)/2)
+        pd()
+        write('Milijunaš',align = 'center',font=('Arial', 30, 'normal'))
+
+        width(3)
+        pu()
+        goto(50,self.b/12)
+        pd()
+        fillcolor('purple')
+        begin_fill()
+        circle(25)
+        end_fill()
+        pu()
+        goto(110,self.b/12+11)
+        pd()
+        write('Pitaj publiku',align = 'left',font=('Arial', 16, 'normal'))
+        
+        pu()
+        goto(50,0)
+        pd()
+        fillcolor('red')
+        begin_fill()
+        circle(25)
+        end_fill()
+        pu()
+        goto(110,11)
+        pd()
+        write('Makni 2',align = 'left',font=('Arial', 16, 'normal'))
+        
+    def pitanje(self,string,br_bd):
+        ##okvir s pitanjem
+        pu()
+        goto(-self.a/2+40,self.b/6)
+        pd()
+        color('chocolate')
+        pencolor('black')
+        width(5)
+        begin_fill()
+        pravokutnik(self.a-80,50)
+        end_fill()
+        color('black')
+        pu()
+        ###########
+        if "|" in string:
+            x = string.find('|')
+            str1 = string[:x]
+            str2 = string[x+1:]
+            goto(0,self.b/6+25)
+            write(str1,align = 'center',font=('Arial', 11, 'normal'))
+            goto(0,self.b/6-10)
+            write(str2,align = 'center',font=('Arial', 11, 'normal'))
+        else:
+            goto(0,self.b/6)
+            write(string,align = 'center',font=('Arial', 11, 'normal'))
+        pu()
+        goto(0,self.b/2-175)
+        pd()
+        write('Pitanje za '+str(br_bd)+' bodova',align = 'center',font=('Arial', 20, 'normal'))
+
+            
+    def odgovori(self,a1,a2,a3,a4):
+        ##okvir s 4 odgovora
+        l = [-self.a/2+40,-100,20,-100,-self.a/2+40,-170,20,-170]
+        l2 = [-self.a/4+10,-100,self.a/4-10,-100,-self.a/4+10,-170,self.a/4-10,-170]
+        g = 0
+        l3 = [a1,a2,a3,a4]
+        l4 = ['A)','B)','C)','D)']
+        for i in range(0,8,2):
+            pu()
+            goto(l[i],l[i+1])
+            pd()
+            color('chocolate')
+            pencolor('black')
+            width(5)
+            begin_fill()
+            pravokutnik(self.a/2-60,50)
+            end_fill()
+            color('black')
+            goto(l2[i],l2[i+1])
+            write(l4[g]+l3[g],align = 'center',font=('Arial', 11, 'normal'))
+            g += 1 
+        return
+
+
+    def prekrizi(self,odg1):
+        ##zasjeni odgovor
+        l = [-self.a/2+30,-75,10,-75,-self.a/2+30,-145,10,-145]
+        x1 = int(odg1)*2 - 2
+        x2 = int(odg1)*2 - 1
+        pu()
+        goto(l[x1],l[x2])
+        pd()
+        color('red')
+        width(5)
+        fd(self.a/2-40)
+        return
+    
+    def publikagraf(self, lista):
+        ##graf s odgovorima publike
+        b = ['red','green','yellow','orange','grey']
+        pu()
+        goto(-self.a/2+60,0)
+        color('black')
+        width(5)
+        pd()
+        fd(105)
+        bk(105)
+        lt(90)
+        fd(100);bk(100);rt(90)
+        width(2)
+        for i in range(4):
+            x = randint(0,4)
+            fillcolor(b[x])
+            fd(5)
+            begin_fill()
+            pravokutnik(20,lista[i])
+            end_fill()
+            fd(20)
+        return
+
+global ui
+ui = UI(500,800,'DarkCyan',25,'black')
+
+dat = open('Ulaz.txt','r')
+lista = dat.readlines()
+global lista2
+lista2 = [[],[],[],[],[],[],[],[],[],[],[],[]]
+
+g = 10
+b = 0
+for i in range(0,len(lista),6):
+    if i/60 == 1:
+        g = 50
+        b = 1
+    elif i/120 == 1:
+        g = 100
+        b = 2
+    elif i/180 == 1:
+        g = 500
+        b = 3
+    elif i/240 == 1:
+        g = 1000
+        b = 4
+    elif i/300 == 1:
+        g = 5000
+        b = 5
+    elif i/360 == 1:
+        g = 10000
+        b = 6
+    elif i/420 == 1:
+        g = 50000
+        b = 7
+    elif i/480 == 1:
+        g = 100000
+        b = 8
+    elif i/540 == 1:
+        g = 250000
+        b = 9
+    elif i/600 == 1:
+        g = 500000
+        b = 10
+    elif i/660 == 1:
+        g = 1000000
+        b = 11        
+    lista2[b].append(Pitanja(lista[i],lista[i+1],lista[i+2],lista[i+3],lista[i+4],lista[i+5],g))
+
+class Koordinate:
+    def __init__(self,toc_odg):
+        self.x = 0  
+        self.y = 0
+        self.pit = toc_odg
+        self.pub = False
+        self.remov = False
+        self.t_odg = True
+        self.tocan_odg = False
+        self.boolean = True
+        self.i = 1
+        self.povratak = True
+        #####
+        ontimer(self.metoda, 1000)
+
+    def click(self, x, y):
+        self.x = x
+        self.y = y
+
+    def metoda(self):
+
+        ontimer(self.metoda, 1000)
+        if self.i == 12 and self.tocan_odg == True and self.t_odg == False:
+            pu()
+            reset()
+            home()
+            ht()
+            write('Čestitamo na pobjedi!',align = 'center',font=('Arial', 20, 'normal'))
+            sleep(3)
+            bye()
+        if self.tocan_odg == True and self.t_odg == False and self.povratak==False and self.i != 13:
+            self.tocan_odg = False
+            self.t_odg = True
+            self.povratak = True
+            reset()
+            home()
+            x = randint(0,9)
+            pitanj = lista2[self.i][x]
+            self.pit = pitanj.toc_odg
+            print(pitanj.toc_odg)
+            ui.screen()
+            ui.pitanje(pitanj.pit,pitanj.bod)
+            ui.odgovori(pitanj.odg1,pitanj.odg2,pitanj.odg3,pitanj.odg4)
+            self.i+=1
+        
+        if self.tocan_odg == False and self.t_odg == False:
+            pu()
+            goto(0,-40)
+            color('black')
+            write('Igra je završila!',align = 'center',font=('Arial', 25, 'normal'))
+            sleep(3)
+            bye()
+            
+        if (self.x-50)**2+(self.y-91)**2<625 and self.pub == False:
+            self.pub = True
+            publika(self.pit)
+            self.x,self.y = 0,0
+        elif (self.x-50)**2+(self.y-25)**2<625 and self.remov == False:
+            self.remov = True
+            remove2(self.pit)
+            self.x,self.y = 0,0
+        elif self.x>-210 and self.y>-100 and self.x<-20 and self.y<-50:
+            self.tocan_odg = odgovor('1',self.pit,self.t_odg)
+            self.x,self.y = 0,0
+            self.t_odg = False
+        elif self.x>20 and self.y>-100 and self.x<210 and self.y<-50:
+            self.tocan_odg = odgovor('2',self.pit,self.t_odg)
+            self.x,self.y = 0,0
+            self.t_odg = False
+        elif self.x>-210 and self.y>-170 and self.x<-20 and self.y<-120:
+            self.tocan_odg = odgovor('3',self.pit,self.t_odg)
+            self.x,self.y = 0,0
+            self.t_odg = False
+        elif self.x>20 and self.y>-170 and self.x<210 and self.y<-120:
+            self.tocan_odg = odgovor('4',self.pit,self.t_odg)
+            self.x,self.y = 0,0
+            self.t_odg = False
+        elif self.tocan_odg == True and self.t_odg == False:
+            self.povratak = False
+        return
+
+
+x = randint(0,9)           
+pitanj1 = lista2[0][x]    
+kord = Koordinate(pitanj1.toc_odg)
+print(pitanj1.toc_odg)
+jedan = True
+if jedan:
+    jedan = False
+    ui.screen()
+    ui.pitanje(pitanj1.pit,pitanj1.bod)
+    ui.odgovori(pitanj1.odg1,pitanj1.odg2,pitanj1.odg3,pitanj1.odg4)
+onscreenclick(kord.click)
+mainloop()
+
