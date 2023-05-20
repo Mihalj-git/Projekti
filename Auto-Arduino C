@@ -1,0 +1,109 @@
+//includaj servo library i timer
+#include <Servo.h>
+Servo mojServo;
+//definiraj pinove za senzore
+int IRPin1 = 10;
+int IRPin2 = 11;
+int Echo = 13;
+int Trigger = 12;
+int ServoPin = 9;
+int DCPin1 = 3;
+int DCPin2 = 5;
+int gumb = 7;
+//definiraj varijable = udaljenost i vrijeme(ultrasonični senzor),brzina(DC motor), kut(servo), 
+int udaljenost = 0;
+unsigned long vrijeme= 0;
+int pos = 85;
+void setup(){
+//svi pinovi na modove
+  pinMode(gumb,INPUT);
+  pinMode(IRPin1,INPUT);
+  pinMode(IRPin2,INPUT);
+  pinMode(Echo,INPUT);
+  pinMode(Trigger,OUTPUT);
+  pinMode(DCPin1,OUTPUT);
+  pinMode(DCPin2,OUTPUT);
+//pokreni servo i timer
+  mojServo.attach(9);
+//pokreni Serial komunikaciju
+  Serial.begin(9600);
+  
+ }
+ void loop(){
+   analogWrite(DCPin1, 255);
+   digitalWrite(DCPin2, LOW);
+   mojServo.write(pos);
+ //IR senzori i gumb
+   if (digitalRead(gumb) == HIGH){
+   
+     if ((digitalRead(IRPin1) == LOW) && (digitalRead(IRPin2) == HIGH)){
+       mojServo.write(65);
+       Serial.println("ne");
+     
+     }
+     if ((digitalRead(IRPin2) == LOW) && (digitalRead(IRPin1) == HIGH)){
+      mojServo.write(95);
+      Serial.println("da");
+     }
+     if ((digitalRead(IRPin1) == LOW) && (digitalRead(IRPin2) == LOW)){
+      mojServo.write(85);       
+      }
+     if ((digitalRead(IRPin1) == HIGH) && (digitalRead(IRPin2) == HIGH)){
+      mojServo.write(85);       
+      digitalWrite(DCPin1,LOW);
+      digitalWrite(DCPin2,LOW);
+      }
+   }
+   digitalWrite(Trigger, LOW);  
+   delayMicroseconds(2);
+   digitalWrite(Trigger, HIGH);
+   delayMicroseconds(10);
+   digitalWrite(Trigger,LOW);
+   vrijeme = pulseIn(Echo, HIGH);
+   udaljenost = (vrijeme / 2)/ 29.1; 
+   Serial.println(udaljenost);
+ //ako ultrasonični senzor vidi prepreku sa male udaljenosti= idi natrag
+   if (udaljenost <= 25){
+     digitalWrite(DCPin2, LOW);
+     digitalWrite(DCPin1, LOW);
+     mojServo.write(65);
+     analogWrite(DCPin2,255);
+     digitalWrite(DCPin1, LOW); 
+     delay(500);  
+     digitalWrite(DCPin2, LOW);
+     digitalWrite(DCPin1, LOW);
+     mojServo.write(100);
+     analogWrite(DCPin2,255);
+     digitalWrite(DCPin1, LOW);
+     delay(500);
+      
+   }
+   
+
+ }
+//Mogucnost kontrole joystickom-nedovrseno
+//void serialEvent(){
+// int val = Serial.read() - '0';
+// if(val == 1){
+//   digitalWrite(DCPin2, LOW);
+//   analogWrite(DCPin1,100);
+//   Serial.println("Procitao 1");
+// 
+// }else if(val == 2){
+//   analogWrite(DCPin2,255);
+//   digitalWrite(DCPin1, LOW);
+//   Serial.println("Procitao 2"); 
+// }else if(val == 3){
+// kut = 70;
+// nasServo.write(kut);
+// 
+// }else if(val == 4){
+// kut = 110;
+// nasServo.write(kut);
+// 
+//  }else if(val == 5){
+//   digitalWrite(DCPin2, LOW);
+//   digitalWrite(DCPin1, LOW);
+//   Serial.println("STOP!");
+//  }
+//}
