@@ -1,0 +1,222 @@
+#### "Milijunaš"
+
+from tkinter import *
+from random import *
+from turtle import *
+from time import *
+
+
+global broj
+broj = 0
+global t
+t = Tk()       
+global rbol
+global pubbol
+rbol = False
+pubbol = False
+
+def odgovor(odg1,toc_odg):
+    global broj
+    global t
+    if int(odg1) == int(toc_odg) and broj<10:
+        ##novi screen
+        broj += 1
+        
+        t.destroy()
+        t = Tk()
+        g = App(t,lista2)
+        return
+    
+    elif int(odg1) != int(toc_odg):
+        ##game over screen
+        t.destroy()
+        t = Tk()
+
+        b = Label(t,text = 'Igra je završila! Osvojili ste {} bodova!'.format(lista2[broj][1].bod),fg="white",bg="darkblue",width=50,height=15)
+        b.grid(row = 2,column = 2)
+        return
+    
+    else:
+        ##Pobjeda
+        t.destroy()
+        t = Tk()
+        b = Label(t,text = 'Pobijedili ste Milijunaša!',fg="white",bg="darkblue",width=50,height=15)
+        b.grid(row = 2,column = 2)
+        return
+    return
+
+class Pitanja:
+
+    
+    def __init__(self, pit, odg1,odg2,odg3,odg4, tocan_odg, br_bodova):
+        self.pit = str(pit)
+        self.odg1 = str(odg1)
+        self.odg2 = str(odg2)
+        self.odg3 = str(odg3)
+        self.odg4 = str(odg4)
+        self.toc_odg = tocan_odg
+        self.bod = br_bodova
+        return
+
+
+    def __repr__(self):
+        return str(self.pit)
+
+
+    
+dat = open('Ulaz.txt','r')
+lista = dat.readlines()
+global lista2
+lista2 = [[],[],[],[],[],[],[],[],[],[],[],[]]
+
+g = 10
+b = 0
+
+for i in range(0,len(lista),6):
+    if i/60 == 1:
+        g = 50
+        b = 1
+    elif i/120 == 1:
+        g = 100
+        b = 2
+    elif i/180 == 1:
+        g = 500
+        b = 3
+    elif i/240 == 1:
+        g = 1000
+        b = 4
+    elif i/300 == 1:
+        g = 5000
+        b = 5
+    elif i/360 == 1:
+        g = 10000
+        b = 6
+    elif i/420 == 1:
+        g = 50000
+        b = 7
+    elif i/480 == 1:
+        g = 100000
+        b = 8
+    elif i/540 == 1:
+        g = 250000
+        b = 9
+    elif i/600 == 1:
+        g = 500000
+        b = 10
+    elif i/660 == 1:
+        g = 1000000
+        b = 11        
+    lista2[b].append(Pitanja(lista[i],lista[i+1],lista[i+2],lista[i+3],lista[i+4],lista[i+5],g))
+
+
+
+class App(Frame):
+
+    def __init__(self, tt,lista):
+        self.win = tt
+        self.win.title('Milijunaš!')
+        super().__init__(self.win)
+        self.config(bg = 'darkblue')
+        self.grid(column = 6,row =12, rowspan = 8, columnspan = 5)
+        g = int(randint(0,9))
+        self.pitanje = lista[broj][g]
+        self.sucelje(lista)
+        return
+
+
+    
+    def remove2(self):
+        global rbol
+        if rbol != True:
+            lista_1 = [1,2,3,4]
+            lista_1.remove(int(self.pitanje.toc_odg))
+            x = randint(0,2)
+            lista2_1 = []
+            lista2_1.append(lista_1.pop(x))
+            x = randint(0,1)
+            lista2_1.append(lista_1.pop(x))
+
+            for i in range(2):
+                odg = lista2_1[i]
+                if odg == 1:
+                    x1 = Label(self, text = '----------------------')
+                    x1.grid(row = 2,column = 1)
+                elif odg == 2:
+                    x2 = Label(self, text = '----------------------')
+                    x2.grid(row = 2,column = 5)
+                elif odg == 3:
+                    x3 = Label(self, text = '----------------------')
+                    x3.grid(row = 3,column = 1)
+                elif odg == 4:
+                    x4 = Label(self, text = '----------------------')
+                    x4.grid(row = 3,column = 5)
+            rbol = True
+            return
+
+
+    def publikagraf(self):
+        global pubbol
+        if pubbol != True:
+            lista_1 = [1,2,3,4]
+            x = randint(1,60)
+            y = 20 + randint(1,80-x)
+            z = randint(0,100-x-y)
+            g = 100-x-y-z
+            k = 0
+            lista_1[int(self.pitanje.toc_odg)-1] = y
+            l = [x,z,g]
+            for i in range(len(lista_1)):
+                if i != (int(self.pitanje.toc_odg)-1):
+                    lista_1[i] = l[k]
+                    k += 1
+                    
+            
+            x1 = Label(self, text = '1. odgovor ='+str(lista_1[0])+'%',width=16,height=2)
+            x1.grid(row = 5,column = 3)
+            x2 = Label(self, text = '2. odgovor ='+str(lista_1[1])+'%',width=16,height=2)
+            x2.grid(row = 6,column = 3)
+            x3 = Label(self, text = '3. odgovor ='+str(lista_1[2])+'%',width=16,height=2)
+            x3.grid(row = 7,column = 3)
+            x4 = Label(self, text = '4. odgovor ='+str(lista_1[3])+'%',width=16,height=2)
+            x4.grid(row = 8,column = 3)
+
+            pubbol = True
+            return
+
+
+    def sucelje(self,lista):
+
+        
+        self.b = Label(self, text = str(self.pitanje.pit),fg="white",bg="darkblue",font=("Arial", 13))
+        self.b.grid(row = 1,column = 3)
+        ##pitanje
+        
+        self.gb1 = Button(self,text = '1.'+self.pitanje.odg1, command = lambda: odgovor(' 1', str(self.pitanje.toc_odg)),fg="white",bg="purple",width=15,height=2)
+        self.gb1.grid(row = 2,column = 1)
+        self.gb2 = Button(self,text = '2.'+self.pitanje.odg2, command = lambda: odgovor(' 2', str(self.pitanje.toc_odg)),fg="white",bg="purple",width=15,height=2)
+        self.gb2.grid(row = 2,column = 5)
+        self.gb3 = Button(self,text = '3.'+self.pitanje.odg3, command = lambda: odgovor(' 3', str(self.pitanje.toc_odg)),fg="white",bg="purple",width=15,height=2)
+        self.gb3.grid(row = 3,column = 1)
+        self.gb4 = Button(self,text = '4.'+self.pitanje.odg4, command = lambda: odgovor(' 4',str(self.pitanje.toc_odg)),fg="white",bg="purple",width=15,height=2)
+        self.gb4.grid(row = 3,column = 5)
+
+
+
+        ##gumbovi
+        self.rem = Button(self,text = 'Izbaci 2', command = self.remove2)
+        self.rem.grid(row = 4,column = 1)
+        self.pub = Button(self,text = 'Publika', command = self.publikagraf)
+        self.pub.grid(row = 4,column = 3)
+        
+        return
+
+
+
+
+
+
+
+app = App(t,lista2)    
+t.mainloop()
+
+
