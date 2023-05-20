@@ -20,7 +20,13 @@ prednjih kotača kako bi se automobil mogao pravilno usmjeriti. Mala prijenosna 
 
 Društvena igra na temelju Rizika:
 
-
+Program je namijenjen kao dodatak društvenoj igri temeljenoj na Riziku. Omogućava određene događaje i situacije unutar same igre poput 
+stvaranja koalicije protiv određenog igrača koji je previše proširio svoj teritorij, dolazak kriznih situacija(opisanih u programu kao "kriza") 
+i njihova klasifikacija u određene veličine. Arduino je spojen na nekoliko gumbova i LCD zaslon pomoću kojih igrači unose i primaju podatke od 
+algoritma. Sam algoritam funkcionira na temelju vremena i akcija određenih igrača, svaka akcija igrača mijenja trenutno ponašanje algoritma tako da 
+ga približava određenim postupcima(npr. napad na drugu državu izaziva porast svjetskih tenzija što smanjuje vrijeme potrebno za dolazak nove "krize").
+Određene odluke igrača također mogu pridonijeti nekim događajima poput stvaranja Afričko-Europske Unije kao nove države na karti. Algoritam računa 
+određene promjene na kraju poteza a prikazuje ih igračima početkom sljedećeg. Svaki igrač ima svoj potez, a broj igrača se bira na početku runde.
 
 Milijunaš:
 
