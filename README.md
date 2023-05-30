@@ -33,3 +33,7 @@ Milijunaš:
 
 Interaktivna igra Milijunaš temeljena na istoimenoj televizijskoj igri. Korištenjem Python-a i njegovih library-ja dizajnirano je grafičko 
 sučelje te sam algoritam za igru. Grafičko sučelje je napravljeno na dva načina, korištenjem Turtle te Tkinter bibilioteka.
+
+Morseov_kod
+
+Program koji na početku pita korisnika želi li prevoditi na ili s Morseovog koda. GUI sučelje je implementirano za ispisivanje Morseovog koda.
