@@ -1,0 +1,206 @@
+from turtle import *
+
+dat = open('izlaz.txt', 'w')
+
+
+potvrda = input('Prevođenje na Morseov kod(0),prevođenje s Morseovog koda(1) ili ništa(2) = ')
+if potvrda not in '012':
+    print('Krivo uneseno!')
+elif potvrda == '2':
+    print('Nema unosa teksta!')
+else:
+    string = input('Tekst: ')
+
+rjecnik = {'A':'.-', 'B':'-...',
+           'C':'-.-.', 'D':'-..', 'E':'.',
+           'F':'..-.', 'G':'--.', 'H':'....',
+           'I':'..', 'J':'.---', 'K':'-.-',
+           'L':'.-..', 'M':'--', 'N':'-.',
+           'O':'---', 'P':'.--.', 'Q':'--.-',
+           'R':'.-.', 'S':'...', 'T':'-',
+           'U':'..-', 'V':'...-', 'W':'.--',
+           'X':'-..-', 'Y':'-.--', 'Z':'--..',
+           '1':'.----', '2':'..---', '3':'...--',
+           '4':'....-', '5':'.....', '6':'-....',
+           '7':'--...', '8':'---..', '9':'----.',
+           '0':'-----', ', ':'--..--', '.':'.-.-.-',
+           '?':'..--..', '/':'-..-.', '-':'-....-',
+           '(':'-.--.', ')':'-.--.-'}
+
+##Prevođenje na Morseov kod
+if potvrda == '0':
+    dat.write('Prijevod teksta na Morseov kod: ')
+    for slovo in string:
+        if slovo == ' ':
+            dat.write('  ')
+        else:
+            morse=rjecnik[slovo.upper()]+' '
+            dat.write(morse)
+            
+##Prevođenje s Morseovog koda
+elif potvrda == '1':
+    dat.write('Prijevod teksta s Morseovog koda: ')
+    x = ''
+    string+= ' '
+    for kod in string:
+        if kod == ' ':
+            for i in rjecnik:
+                if rjecnik[i]==x:
+                    morse=i
+                    dat.write(morse)
+            x = ''
+        elif kod == "/":
+            for i in rjecnik:
+                if rjecnik[i]==x:
+                    morse=i
+                    dat.write(morse)
+            x = ''
+            dat.write(' ')
+        else:
+            x += kod
+            
+##Prebacivanje gumbova u Morseov kod
+string2 = ''
+def klik(x,y):
+    global string2
+    if x>-200 and x<-50 and y<-50 and y>-200:
+        dat.write('.')
+        string2 += '.'
+    elif x>50 and x<200 and y<200 and y>50:
+        dat.write('\n')
+        string2 += '/'
+    elif x>-200 and x<-50 and y<200 and y>50:
+        dat.write(' ')
+        string2 += ' '
+    elif x>50 and x<200 and y<-50 and y>-200:
+        dat.write('-')
+        string2 += '-'
+        
+
+##Funkcije za crtanje gumbova i pravokutnika   
+def crtanje_gumbova(a,x,y):
+    pu()
+    goto(x,y)
+    pd()
+    fillcolor('black')
+    pencolor('black')
+    begin_fill()
+    for i in range(4):
+        fd(a)
+        lt(90)
+    end_fill()
+    
+def pravokutnik(a,b,boja):
+    fillcolor(boja)
+    begin_fill()
+    for i in range(2):
+        fd(a);lt(90);fd(b);lt(90)
+    end_fill()
+
+##funkcija pisanja
+def ispis(string):
+    fillcolor('brown');write(string, False, align = 'center', font=('Arial',14,'normal'))
+
+##prelaženje u 2 nova reda zbog gumbova i preglednosti    
+dat.write('\n')
+dat.write('\n')
+
+boolean = input('Želiš li unijeti ručno dio koda?(D/N)')
+
+##tracer(False)
+speed(50)
+
+##crtanje
+if boolean == 'D':
+    
+    width(7)
+    colormode(255)
+    pu();goto(-325,-325);pd()
+    pencolor('brown')
+    fillcolor(184,184,184)
+    begin_fill()
+    for i in range(4):
+        fd(650)
+        lt(90)
+    end_fill()
+    pu();goto(0,225);pd()
+    write('Morseov prevoditelj', False, align = 'center', font=('Arial',30,'normal'))
+    ##Gumb 1
+    width(5)
+    crtanje_gumbova(150,-200,-200)
+    width(1)
+            ##Znak 1-krug
+    pu();goto(-125,-155);pd();fillcolor('brown');begin_fill();circle(30);end_fill()
+    pu();goto(-125,-250);pd();ispis('Kratki impuls')
+    ##Gumb 2
+    width(5)
+    crtanje_gumbova(150,50,-200)
+    width(1)
+            ##Znak 2-pravokutnik
+    pu();goto(75,-145);pd();pravokutnik(100,40,'green')
+    pu();goto(125,-250);pd();ispis('Dugi impuls')
+    ##Gumb 3
+    width(5)
+    crtanje_gumbova(150,-200,50)
+    width(1)
+            ##Znak 3-naopaki most
+    pu();goto(-175,100);pd();fillcolor('pink');begin_fill();pu();fd(25);pd();fd(50);pu();
+    fd(25);lt(90);fd(25);lt(90);fd(25);pd();fd(50);pu();fd(25);lt(90);fd(25);lt(90);end_fill()
+
+    pu();goto(-175,100);pd();pravokutnik(25,50,'pink');
+    pu();goto(-100,100);pd();pravokutnik(25,50,'pink');
+
+    pu();goto(-175,100);pd();fillcolor('pink');begin_fill();pu();fd(25);fd(50);fd(25);
+    lt(90);fd(25);lt(90);fd(25);fd(50);fd(25);lt(90);fd(25);lt(90);end_fill();pd()
+
+    pu();goto(-125,0);pd();ispis('Razmak')
+
+    ##Gumb 4
+    width(5)
+    crtanje_gumbova(150,50,50)
+    width(1)
+            ##Znak 4-2 okomita pravokutnika 
+    pu();goto(87.5,137.5);pd();pravokutnik(75,25,'blue')
+    pu();goto(137.5,85);pd();
+    begin_fill();fd(25);lt(90);fd(75);lt(90);pu();fd(25);lt(90);fd(25);pd();fd(50);end_fill()
+    pu();goto(125,0);pd();ispis('Novi red')
+
+    ##Završetak grafičkog dijela i pohrana podataka u datoteku
+    ht()
+    dat.write('Rucno dani kod: ')
+    onscreenclick(klik)
+    mainloop()
+
+##Završetak koda i zadnje prevođenje     
+zavrs = input('Kada zelis zavrsiti program napisi DA: ')
+if zavrs == 'DA':
+    x = ''
+    string_ispis = ''
+    string2 += ' '
+    for kod in string2:
+        if kod == ' ':
+            for i in rjecnik:
+                if rjecnik[i]==x:
+                    morse=i
+                    string_ispis += morse
+            x = ''
+        elif kod == '/':
+            for i in rjecnik:
+                if rjecnik[i]==x:
+                    morse=i + '/'
+                    string_ispis += morse 
+            x = ''
+            string_ispis += ' '
+        else:
+            x += kod
+    if string_ispis != '':
+        print('Ispis prijevoda ručno zadanog Morseovog koda =',string_ispis)
+        dat.write('\n')
+        b = 'Prijevod rucno zadanog Morseovog koda: '
+        dat.write(b)
+        dat.write(string_ispis)
+else:
+    print('Krivo upisano! Ponovno pokreni program.')
+    
+dat.close()
+
